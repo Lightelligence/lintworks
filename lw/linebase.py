@@ -3,7 +3,7 @@
 These two prototypical examples can be directly used as the basis for other rules.
 
 """
-import base
+from lw import base
 
 class LineBroadcaster(base.Broadcaster): # pylint: disable=too-few-public-methods
     """Broadcast every line of a file to all listeners.
