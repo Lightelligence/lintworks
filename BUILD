@@ -1,10 +1,12 @@
 py_library(
     name = "lintworks",
-    srcs = [
-        "lintworks/base.py",
-        "lintworks/linebase.py",
+    srcs = [],
+    deps = [
+        "//lw:base",
+        "//lw:linebase",
     ],
-)
+    visibility = ["//visibility:public"],
+)    
 
 py_test(
     name = "test_registry",

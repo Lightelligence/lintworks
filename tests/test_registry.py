@@ -8,8 +8,7 @@ import unittest
 from mock import MagicMock
 from collections import defaultdict
 
-from context import lintworks
-from lintworks import base
+from lw import base
 
 # pylint: disable=too-few-public-methods,missing-docstring,unused-variable
 
