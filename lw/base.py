@@ -10,6 +10,9 @@ lines of a file.
 
 """
 from collections import defaultdict
+import glob
+import importlib.util
+import os
 
 class IllegalListenerError(Exception):
     """Given Listener is programmed illegally.
@@ -223,4 +226,17 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
     def enable(self):
         for bc in self.subscribe_to:
             self._pay_attention_to(bc)
+
+
+
+def glob_import_rules(filename):
+    lib_dir = os.path.abspath(os.path.dirname(filename))
+    srcs = glob.glob(os.path.join(lib_dir, "*.py"))
+
+    for src in srcs:
+        if src == filename:
+            continue
+        spec = importlib.util.spec_from_file_location("module.name", src)
+        foo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(foo)
 
