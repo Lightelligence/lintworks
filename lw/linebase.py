@@ -31,8 +31,12 @@ class LineBroadcaster(base.Broadcaster): # pylint: disable=too-few-public-method
 
         """
         super(LineBroadcaster, self).__init__(filename, fstream, *args, **kwargs)
-        for i, line in enumerate(fstream.readlines()):
-            self.broadcast(i, line)
+        try:
+            for i, line in enumerate(fstream.readlines()):
+                self.broadcast(i, line)
+        except UnicodeDecodeError as exc:
+            raise ValueError("There's unicode in {}:\n{}".format(filename, str(exc)))
+
         self.eof()
 
     def eof(self):
