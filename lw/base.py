@@ -239,4 +239,3 @@ def glob_import_rules(filename):
         spec = importlib.util.spec_from_file_location("module.name", src)
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
-
