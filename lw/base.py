@@ -230,12 +230,12 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
 
 
 def glob_import_rules(filename):
-    lib_dir = os.path.abspath(os.path.dirname(filename))
+    abs_filename = os.path.abspath(filename)
+    lib_dir = os.path.dirname(abs_filename)
     srcs = glob.glob(os.path.join(lib_dir, "*.py"))
-
     for src in srcs:
-        if src == filename:
+        if os.path.abspath(src) == abs_filename:
             continue
-        spec = importlib.util.spec_from_file_location("module.name", src)
+        spec = importlib.util.spec_from_file_location(src, src)
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
