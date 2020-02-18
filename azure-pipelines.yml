@@ -11,7 +11,7 @@ stages:
       steps:
       - bash: |
           source activate digital
-          find -L `bazel info bazel-testlogs` -name "test.xml" | xargs rm
+          find -L `bazel info bazel-testlogs` -name "test.xml" | xargs rm -f
           bazel test --cache_test_results=no --jobs 8 --test_output=all ...
         displayName: 'Run Tests'
 
