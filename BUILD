@@ -18,7 +18,7 @@ py_binary(
 py_test(
     name = "test_registry",
     srcs = ["tests/test_registry.py"],
-    deps = [":lintworks"],
+    deps = [":lib"],
 )
 
 
