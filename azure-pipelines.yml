@@ -10,6 +10,7 @@ stages:
   - stage: 'all'
     pool:
       name: CI
+    jobs:
     - job: 'bazel_tests'
       displayName: 'Bazel Tests'
       steps:
