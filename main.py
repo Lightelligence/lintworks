@@ -88,6 +88,9 @@ def main(argv):
             raise AttributeError("file {} did not contain a variable 'top_broadcaster'".format(rc))
 
     for fname in gc.options.files:
+        # Ignore temporary files
+        if fname.endswith('~'):
+            continue
         for top_broadcaster in top_broadcasters:
             with open(fname) as fstream:
                 lbc = top_broadcaster(fname, fstream, parent=None, gc=gc)
