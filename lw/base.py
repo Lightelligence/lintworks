@@ -217,6 +217,7 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
         if broadcaster_class not in self._ignored_broadcasters:
             raise IllegalListenerError("{} was not previously ignored by {}".format(broadcaster_class, self))
         setattr(self, broadcaster_class.listener_function_name(), self._ignored_broadcasters[broadcaster_class])
+        del self._ignored_broadcasters[broadcaster_class]
 
 
     def disable(self):
