@@ -1,0 +1,8 @@
+name: lintworks
+channels:
+ - conda-forge
+dependencies:
+ - python=3.6
+ - pip==20.2.3
+ - pip:
+   - mock
