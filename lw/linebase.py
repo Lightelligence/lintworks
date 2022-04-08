@@ -5,12 +5,14 @@ These two prototypical examples can be directly used as the basis for other rule
 """
 from lw import base
 
+
 class LineBroadcaster(base.Broadcaster): # pylint: disable=too-few-public-methods
     """Broadcast every line of a file to all listeners.
 
     The update method for this Broadcaster is "update_line".
 
     """
+
     @classmethod
     def from_filename(cls, filename):
         fstream = open(filename)
@@ -51,6 +53,7 @@ class LineListener(base.Listener): # pylint: disable=too-few-public-methods
 
     """
     subscribe_to = [LineBroadcaster]
+
     def __init__(self, filename, fstream, *args, **kwargs):
         self.filename = filename
         super(LineListener, self).__init__(filename, fstream, *args, **kwargs)
