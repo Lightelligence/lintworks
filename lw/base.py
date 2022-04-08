@@ -14,6 +14,7 @@ import glob
 import importlib.util
 import os
 
+
 class IllegalListenerError(Exception):
     """Given Listener is programmed illegally.
 
@@ -35,16 +36,19 @@ class IllegalBroadcasterError(Exception):
 
 
 class ReportServer(object):
+
     def error(*args):
         raise NotImplementedError("Still working on this...")
 
 
 class GlobalConfig(object):
+
     def __init__(self):
         self.rs = ReportServer()
 
 
 class Base(object):
+
     def __init__(self, *args, **kwargs):
         self.gc = kwargs['gc'] # Instance of GlobalConfig
         self.parent = kwargs['parent']
@@ -92,7 +96,7 @@ class Broadcaster(Base): # pylint: disable=too-few-public-methods
                 kwargs['parent'] = self
                 new_listener = listener_class(*args, **kwargs)
                 kwargs['created_instances'][listener_class] = new_listener
-                
+
             self.listener_instances.append(new_listener)
 
     def _broadcast(self, function_name, *args):
@@ -101,7 +105,8 @@ class Broadcaster(Base): # pylint: disable=too-few-public-methods
             try:
                 listener_function = getattr(listener, function_name)
             except AttributeError as exc:
-                raise IllegalListenerError("{} subscribed to {} but does not have a {} method.".format(listener.__class__, self.__class__, function_name)) from exc
+                raise IllegalListenerError("{} subscribed to {} but does not have a {} method.".format(
+                    listener.__class__, self.__class__, function_name)) from exc
             if listener_function is not None:
                 listener_function(*args)
 
@@ -129,6 +134,7 @@ class ListenerMeta(type):
     the appropriate Broadcaster class.
 
     """
+
     def __new__(mcs, name, bases, attrs):
         new_class = type.__new__(mcs, name, bases, attrs)
         if Broadcaster in bases:
@@ -139,8 +145,8 @@ class ListenerMeta(type):
     def _handle_broadcaster(new_class): # pylint: disable=bad-mcs-method-argument
         """Check that new Broadcaster class follows conventions."""
         if not new_class.__name__.endswith("Broadcaster"):
-            raise IllegalBroadcasterError(
-                "Broadcaster classes must end name with 'Broadcaster': %s" % new_class.__name__)
+            raise IllegalBroadcasterError("Broadcaster classes must end name with 'Broadcaster': %s" %
+                                          new_class.__name__)
 
     def _handle_listener(new_class): # pylint: disable=bad-mcs-method-argument
         """Check that new Listener class follows conventions.
@@ -150,20 +156,16 @@ class ListenerMeta(type):
 
         """
         if not isinstance(new_class.subscribe_to, list):
-            raise IllegalListenerError("subscribe_to variable must be of type list: %s"
-                                       % new_class)
+            raise IllegalListenerError("subscribe_to variable must be of type list: %s" % new_class)
 
         if len(new_class.subscribe_to) == 0 and new_class.__name__ != "Listener":
-            raise IllegalListenerError(
-                "%s did not subscribe to any broadcasters in subscribe_to class variable"
-                % new_class.__name__)
+            raise IllegalListenerError("%s did not subscribe to any broadcasters in subscribe_to class variable" %
+                                       new_class.__name__)
         for subscription in new_class.subscribe_to:
             try:
                 subscription.listener_registry[subscription].append(new_class)
             except AttributeError:
-                raise IllegalListenerError(
-                    "%s is not a valid Broadcaster to use in subscribe_to field."
-                    % subscription)
+                raise IllegalListenerError("%s is not a valid Broadcaster to use in subscribe_to field." % subscription)
 
 
 class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-methods
@@ -211,14 +213,14 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
 
         """
         if broadcaster_class not in self.subscribe_to:
-            raise IllegalListenerError("Cannot pay attention to {} because it is not a subscription.".format(broadcaster_class))
+            raise IllegalListenerError(
+                "Cannot pay attention to {} because it is not a subscription.".format(broadcaster_class))
         # FIXME is it possible that a pragma could trigger a user to see this error?
         # I.e. if they double waived an error in a file
         if broadcaster_class not in self._ignored_broadcasters:
             raise IllegalListenerError("{} was not previously ignored by {}".format(broadcaster_class, self))
         setattr(self, broadcaster_class.listener_function_name(), self._ignored_broadcasters[broadcaster_class])
         del self._ignored_broadcasters[broadcaster_class]
-
 
     def disable(self):
         for bc in self.subscribe_to:
@@ -227,7 +229,6 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
     def enable(self):
         for bc in self.subscribe_to:
             self._pay_attention_to(bc)
-
 
 
 def glob_import_rules(filename):

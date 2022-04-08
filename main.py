@@ -3,6 +3,7 @@ import importlib.util
 import logging
 import sys
 
+
 class ReportServer(object):
 
     def __init__(self, display_motivation=True):
@@ -10,7 +11,7 @@ class ReportServer(object):
         self.display_motivation = display_motivation
 
         self.error_count = 0
-    
+
     @staticmethod
     def _setup_log():
         log = logging.getLogger("lw")
@@ -39,12 +40,8 @@ class ReportServer(object):
             motivation = "\n{0}Motivation:\n{0}{0}{1}".format(subsequent_indent, listener.__class__.__doc__)
         else:
             motivation = ""
-        
-        self.log.error("%s violates %s%s%s%s",
-                       display_filename, listener.__class__.__name__,
-                       reason,
-                       line,
-                       motivation)
+
+        self.log.error("%s violates %s%s%s%s", display_filename, listener.__class__.__name__, reason, line, motivation)
 
 
 class GlobalConfig(object):
@@ -56,9 +53,7 @@ class GlobalConfig(object):
     @staticmethod
     def parse_args(argv):
         parser = argparse.ArgumentParser()
-        parser.add_argument('files',
-                            nargs='+',
-                            help='Files to check')
+        parser.add_argument('files', nargs='+', help='Files to check')
         parser.add_argument('--rc',
                             dest='rule_config',
                             action='append',
@@ -96,7 +91,7 @@ def main(argv):
                 lbc = top_broadcaster(fname, fstream, parent=None, gc=gc)
 
     return gc.rs.error_count > 0
-    
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

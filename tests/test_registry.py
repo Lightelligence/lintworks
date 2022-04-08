@@ -12,6 +12,7 @@ from lw import base
 
 # pylint: disable=too-few-public-methods,missing-docstring,unused-variable
 
+
 class SubscriptionsTestCase(unittest.TestCase):
     """Check that Broadcasters and Subscribers actually link together."""
 
@@ -25,6 +26,7 @@ class SubscriptionsTestCase(unittest.TestCase):
         Ensure they are connected and the appropriate update function is called.
 
         """
+
         class TestBroadcaster(base.Broadcaster):
             pass
 
@@ -50,6 +52,7 @@ class SubscriptionsTestCase(unittest.TestCase):
         correctly.
 
         """
+
         class Tier0Broadcaster(base.Broadcaster):
             pass
 
@@ -61,7 +64,7 @@ class SubscriptionsTestCase(unittest.TestCase):
 
             def update_tier0(self, *args):
                 # Multiply by 2 to change values rather than doing filtering
-                argsx2 = [x*2 for x in args]
+                argsx2 = [x * 2 for x in args]
                 self.broadcast(*argsx2)
 
         class Tier1Listener(base.Listener):
@@ -72,7 +75,7 @@ class SubscriptionsTestCase(unittest.TestCase):
             subscribe_to = [Tier0Broadcaster, Tier1Broadcaster]
 
         tier0_args = [1, 2, 3]
-        tier1_args = [x*2 for x in tier0_args]
+        tier1_args = [x * 2 for x in tier0_args]
 
         t0_bc = Tier0Broadcaster(gc=None, parent=None)
 
@@ -86,7 +89,7 @@ class SubscriptionsTestCase(unittest.TestCase):
         t1_li.update_tier1 = MagicMock()
         t01_li.update_tier0 = MagicMock()
         t01_li.update_tier1 = MagicMock()
-        
+
         t0_bc.broadcast(*tier0_args)
 
         t01_li.update_tier0.assert_called_with(*tier0_args)
@@ -105,19 +108,19 @@ class SubscriptionsTestCase(unittest.TestCase):
 
     @unittest.skip("Doesn't work when only inheriting from Broadcaster")
     def test_bad_broadcaster_name(self):
-
         """Create a Broadcaster with an illegal name.
 
         This naming convention is strictly enforced for consistency purposes
         (the Broadcaster's update function is derived from its name).
 
         """
+
         def create_bad_broadcaster():
+
             class MyBadBC(base.Broadcaster):
                 pass
 
-        self.assertRaisesRegexp(base.IllegalBroadcasterError,
-                                "Broadcaster classes must end name",
+        self.assertRaisesRegexp(base.IllegalBroadcasterError, "Broadcaster classes must end name",
                                 create_bad_broadcaster)
 
     def test_bad_broadcaster_lis_name(self):
@@ -126,63 +129,65 @@ class SubscriptionsTestCase(unittest.TestCase):
         This test also inherits from Listener, which causes the check to occur.
 
         """
+
         def create_bad_broadcaster():
+
             class MyBadBC(base.Broadcaster, base.Listener):
                 pass
 
-        self.assertRaisesRegex(base.IllegalBroadcasterError,
-                               "Broadcaster classes must end name",
+        self.assertRaisesRegex(base.IllegalBroadcasterError, "Broadcaster classes must end name",
                                create_bad_broadcaster)
 
     def test_no_subscribe_to_set(self):
         """Ensures assertion fires if a user forgets to set subscribe_to."""
+
         class TestBroadcaster(base.Broadcaster):
             pass
 
         def create_bad_listener():
+
             class TestListener(base.Listener):
                 pass
 
-        self.assertRaisesRegex(base.IllegalListenerError,
-                                "did not subscribe to any broadcasters",
-                                create_bad_listener)
+        self.assertRaisesRegex(base.IllegalListenerError, "did not subscribe to any broadcasters", create_bad_listener)
 
     def test_no_listeners(self):
         """Ensures assertion fires if there are no subscriptions."""
+
         def create_bad_listener():
+
             class TestListener(base.Listener):
                 subscribe_to = []
 
-        self.assertRaisesRegex(base.IllegalListenerError,
-                                "did not subscribe to any broadcasters",
-                                create_bad_listener)
+        self.assertRaisesRegex(base.IllegalListenerError, "did not subscribe to any broadcasters", create_bad_listener)
 
     def test_not_a_broadcaster(self):
         """Throw error if a Listener subscribes to a non-Broadcaster."""
+
         def create_bad_listener():
+
             class TestListener(base.Listener):
                 subscribe_to = [object]
 
-        self.assertRaisesRegex(base.IllegalListenerError,
-                                "is not a valid Broadcaster",
-                                create_bad_listener)
+        self.assertRaisesRegex(base.IllegalListenerError, "is not a valid Broadcaster", create_bad_listener)
 
     def test_subscribe_to_is_list(self):
         """Throw error subscribe_to varialbe is not a list."""
+
         class TestBroadcaster(base.Broadcaster):
             pass
 
         def create_bad_listener():
+
             class TestListener(base.Listener):
                 subscribe_to = TestBroadcaster
 
-        self.assertRaisesRegex(base.IllegalListenerError,
-                                "subscribe_to variable must be of type list",
-                                create_bad_listener)
-
+        self.assertRaisesRegex(base.IllegalListenerError, "subscribe_to variable must be of type list",
+                               create_bad_listener)
 
     def test_missing_update_method(self):
         """Throw error if listener doesn't implement correct update method."""
+
         class TestBroadcaster(base.Broadcaster):
             pass
 
@@ -190,10 +195,9 @@ class SubscriptionsTestCase(unittest.TestCase):
             subscribe_to = [TestBroadcaster]
 
         tb = TestBroadcaster(gc=None, parent=None)
-        self.assertRaisesRegex(base.IllegalListenerError,
-                               "subscribed to.*but does not have a update_test method.",
+        self.assertRaisesRegex(base.IllegalListenerError, "subscribed to.*but does not have a update_test method.",
                                tb.broadcast)
-        
+
 
 if __name__ == '__main__':
     unittest.main()
