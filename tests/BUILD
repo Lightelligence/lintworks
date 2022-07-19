@@ -1,4 +1,5 @@
 load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+load("@pip_deps//:requirements.bzl", "requirement")
 
 buildifier(
     name = "buildifier_format_diff",
@@ -25,5 +26,8 @@ buildifier(
 py_test(
     name = "test_registry",
     srcs = ["test_registry.py"],
-    deps = ["//:lib"],
+    deps = [
+        "//:lib",
+        requirement("mock"),
+    ],
 )
