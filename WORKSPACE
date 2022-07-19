@@ -41,6 +41,7 @@ http_archive(
 
 load("@rules_python//python:pip.bzl", "pip_install")
 
+# use pip_install instead of pip_parse because it's easier and this repo is small. See https://github.com/bazelbuild/rules_python/issues/414#issuecomment-915403181
 pip_install(
     name = "pip_deps",
     requirements = "@lintworks//:requirements.txt",
