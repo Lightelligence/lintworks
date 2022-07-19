@@ -15,8 +15,8 @@ jobs:
           bazel-install-path: './.local/bin'
           os: 'linux'
 
-      - name: run-buildifier-diff
-        run: bazel run //tests:buildifier_format_diff
+      # - name: run-buildifier-diff
+      #   run: bazel run //tests:buildifier_format_diff
 
       - name: run-py-tests
         run: bazel run //tests:test_registry
