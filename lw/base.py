@@ -231,12 +231,18 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
             self._pay_attention_to(bc)
 
 
-def glob_import_rules(filename):
+def glob_import_rules(filename, ignored_rules=[]):
     abs_filename = os.path.abspath(filename)
     lib_dir = os.path.dirname(abs_filename)
     srcs = glob.glob(os.path.join(lib_dir, "*.py"))
     for src in srcs:
         if os.path.abspath(src) == abs_filename:
+            continue
+        mod = src.split("/")[-1].replace(".py", "")
+        if mod in ["__init__"]:
+            continue
+        rule = "".join([c.capitalize() for c in mod.split("_")])
+        if rule in ignored_rules:
             continue
         spec = importlib.util.spec_from_file_location(src, src)
         foo = importlib.util.module_from_spec(spec)

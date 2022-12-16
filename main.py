@@ -3,6 +3,7 @@ import importlib.util
 import logging
 import sys
 
+from lw.base import glob_import_rules
 
 class ReportServer(object):
 
@@ -61,6 +62,20 @@ class GlobalConfig(object):
                             required=True,
                             help=("Path to python file containing rules."
                                   "May be specified multiple times."))
+        parser.add_argument('--igr',
+                            dest='ignored_rules',
+                            action='append',
+                            default=[],
+                            required=False,
+                            help=("Rule to be excluded"
+                                  "May be specified multiple times."))
+        parser.add_argument('--igrc',
+                            dest='ignored_rule_config',
+                            action='append',
+                            default=[],
+                            required=False,
+                            help=("Path to file containing rules to be excluded."
+                                  "May be specified multiple times."))
         parser.add_argument('-m',
                             dest='display_motivation',
                             action='store_true',
@@ -72,11 +87,25 @@ class GlobalConfig(object):
 def main(argv):
     gc = GlobalConfig(argv)
 
+    ignored_rules = gc.options.ignored_rules
+
+    for igrc in gc.options.ignored_rule_config:
+        with open(igrc) as rfh:
+            for line in rfh.read().splitlines():
+                line = line.strip().split(" ")[0]
+                if any([line.startswith("#"), line.startswith("//")]):
+                    continue
+                if line not in ignored_rules:
+                    ignored_rules.append(line)
+
     top_broadcasters = []
     for rc in gc.options.rule_config:
         spec = importlib.util.spec_from_file_location(rc, rc)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
+        # print(rc)
+        glob_import_rules(rc, ignored_rules)
+
         try:
             top_broadcasters.append(mod.top_broadcaster)
         except AttributeError:
