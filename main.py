@@ -15,6 +15,8 @@ class ReportServer(object):
     @staticmethod
     def _setup_log():
         log = logging.getLogger("lw")
+        handler = logging.StreamHandler(sys.stdout)
+        log.addHandler(handler)
         return log
 
     def error(self, listener, line_no, line, message):
