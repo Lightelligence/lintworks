@@ -5,6 +5,7 @@ import sys
 
 from lw.base import glob_import_rules
 
+
 class ReportServer(object):
 
     def __init__(self, display_motivation=True):
