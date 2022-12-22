@@ -40,23 +40,18 @@ def insert_at_line(filename, line_number, string):
 
 def main(tool_name):
     """Read stdin and waive all violations by editing source files with pragmas."""
-    violate_re = re.compile(
-        "^(?P<filename>.*?)(:(?P<line_number>[0-9]+)){0,1} violates (?P<rule>.*)"
-    )
+    violate_re = re.compile("^(?P<filename>.*?)(:(?P<line_number>[0-9]+)){0,1} violates (?P<rule>.*)")
 
     lines = sys.stdin.readlines()
 
     re_matches = [violate_re.match(l) for l in lines]
     matches = [m for m in re_matches if m]
 
-    errors = sorted([(m.group('filename'), int(m.group('line_number')),
-                      m.group('rule')) for m in matches])
+    errors = sorted([(m.group('filename'), int(m.group('line_number')), m.group('rule')) for m in matches])
 
     for filename, line_number, error in reversed(errors):
-        insert_at_line(filename, line_number + 1,
-                       f"// {tool_name}: enable={error}\n")
-        insert_at_line(filename, line_number,
-                       f"// {tool_name}: disable={error}\n")
+        insert_at_line(filename, line_number + 1, f"// {tool_name}: enable={error}\n")
+        insert_at_line(filename, line_number, f"// {tool_name}: disable={error}\n")
 
 
 if __name__ == '__main__':
