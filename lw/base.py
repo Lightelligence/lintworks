@@ -240,7 +240,6 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
         self.disable()
 
 
-
 def glob_import_rules(filename, ignored_rules=[]):
     abs_filename = os.path.abspath(filename)
     lib_dir = os.path.dirname(abs_filename)
