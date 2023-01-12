@@ -78,6 +78,7 @@ class Broadcaster(Base): # pylint: disable=too-few-public-methods
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.listener_instances = []
+        self.disabled_rules = kwargs.pop("disabled_rules", [])
         if 'created_instances' not in kwargs:
             kwargs['created_instances'] = {}
         self._create_listener_instances(*args, **kwargs)
@@ -96,7 +97,6 @@ class Broadcaster(Base): # pylint: disable=too-few-public-methods
                 kwargs['parent'] = self
                 new_listener = listener_class(*args, **kwargs)
                 kwargs['created_instances'][listener_class] = new_listener
-
             self.listener_instances.append(new_listener)
 
     def _broadcast(self, function_name, *args):
@@ -180,6 +180,7 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._ignored_broadcasters = {}
+        self._globally_disabled = False
 
     def _ignore(self, broadcaster_class):
         """Stop subscribing to a particular broadcaster.
@@ -197,7 +198,8 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
         if broadcaster_class not in self.subscribe_to:
             raise IllegalListenerError("Cannot ignore {} because it is not a subscription.".format(broadcaster_class))
         if broadcaster_class in self._ignored_broadcasters:
-            raise IllegalListenerError("{} previously ignored by {}".format(broadcaster_class, self))
+            if not self._globally_disabled:
+                raise IllegalListenerError("{} previously ignored by {}".format(broadcaster_class, self))
 
         update_method = getattr(self, broadcaster_class.listener_function_name())
         setattr(self, broadcaster_class.listener_function_name(), None)
@@ -217,6 +219,9 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
                 "Cannot pay attention to {} because it is not a subscription.".format(broadcaster_class))
         # FIXME is it possible that a pragma could trigger a user to see this error?
         # I.e. if they double waived an error in a file
+        if self._globally_disabled:
+            return
+
         if broadcaster_class not in self._ignored_broadcasters:
             raise IllegalListenerError("{} was not previously ignored by {}".format(broadcaster_class, self))
         setattr(self, broadcaster_class.listener_function_name(), self._ignored_broadcasters[broadcaster_class])
@@ -230,6 +235,11 @@ class Listener(Base, metaclass=ListenerMeta): # pylint: disable=too-few-public-m
         for bc in self.subscribe_to:
             self._pay_attention_to(bc)
 
+    def globally_disable(self, val=True):
+        self._globally_disabled = val
+        self.disable()
+
+
 
 def glob_import_rules(filename, ignored_rules=[]):
     abs_filename = os.path.abspath(filename)
@@ -241,9 +251,13 @@ def glob_import_rules(filename, ignored_rules=[]):
         mod = src.split("/")[-1].replace(".py", "")
         if mod in ["__init__"]:
             continue
-        rule = "".join([c.capitalize() for c in mod.split("_")])
-        if rule in ignored_rules:
-            continue
+        # rule = "".join([c.capitalize() for c in mod.split("_")])
+        # if rule in ignored_rules:
+        #     continue
         spec = importlib.util.spec_from_file_location(src, src)
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
+        # if rule in ["Filters"]:
+        #     continue
+        # print(rule)
+        # getattr(foo, rule)().disable()

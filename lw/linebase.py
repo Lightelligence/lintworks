@@ -33,6 +33,8 @@ class LineBroadcaster(base.Broadcaster): # pylint: disable=too-few-public-method
 
         """
         super(LineBroadcaster, self).__init__(filename, fstream, *args, **kwargs)
+        for rule in self.disabled_rules:
+            self.get_listener(rule).globally_disable()
         try:
             for i, line in enumerate(fstream.readlines()):
                 self.broadcast(i, line)
