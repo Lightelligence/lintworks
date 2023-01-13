@@ -96,7 +96,7 @@ def main(argv):
         with open(igrc) as rfh:
             for line in rfh.read().splitlines():
                 line = line.strip().split(" ")[0]
-                if any([line.startswith("#"), line.startswith("//")]):
+                if any([line.startswith("#"), line.startswith("//"), line.strip() == ""]):
                     continue
                 if line not in ignored_rules:
                     ignored_rules.append(line)
@@ -120,7 +120,7 @@ def main(argv):
             continue
         for top_broadcaster in top_broadcasters:
             with open(fname) as fstream:
-                lbc = top_broadcaster(fname, fstream, parent=None, gc=gc)
+                lbc = top_broadcaster(fname, fstream, parent=None, gc=gc, disabled_rules=ignored_rules)
 
     return gc.rs.error_count > 0
 
